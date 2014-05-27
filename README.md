@@ -1,12 +1,16 @@
 Thread JS - A simple library for JavaScript Thread support 
 ==================================================
 
-Contribution Guides
+Introduction
 --------------------------------------
 
-In the spirit of open source software development, Thread JS always encourages community code contribution.
+ThreadJS is a simple approach to execute your JavaScript in different threads. This uses 'Workers' in HTML5 specifications and comes with a 'fallback' mechanism to support unsupported browsers.
 
-For the moment please check on the demo.html for the usage of Thread JS. More improvements, information and examples will be coming soon !!
+
+Support
+--------------------------------------
+Currently this library supports the latest versions of Google Chrome and Firefox and deploys the fallback mechanism in other browsers.
+
 
 Example
 ----------
