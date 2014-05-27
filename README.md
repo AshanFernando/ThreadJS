@@ -27,7 +27,6 @@ Example 1
 		return result;
 	}).finish(function (result) {
 		/* Do something here to handle the result */
-		
 		/* If everthing is done 'Close' the thread */
 		this.close();
 	}).fail(function (error) {
