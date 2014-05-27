@@ -11,5 +11,4 @@ For the moment please check on the demo.html for the usage of Thread JS. More im
 Questions?
 ----------
 
-If you have any questions, please feel free to ask on the
-ashan256@gmail.com 
+If you have any questions, please feel free to send an email to Ashan Fernando (ashan256@gmail.com)
