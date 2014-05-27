@@ -1,4 +1,4 @@
-Thread JS - New Threading Concept for JavaScript with Promise
+Thread JS - A simple library for JavaScript Thread support 
 ==================================================
 
 Contribution Guides
