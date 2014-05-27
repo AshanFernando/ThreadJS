@@ -18,9 +18,7 @@ Example 1
 ```javascript
 
 	var threadInstance = new Thread();
-
 	var count = 1000000000;
-	
 	threadInstance.start(count, function (count) {
 		var result = 0;
 		for (i = 1; i < count; i++) {
@@ -45,7 +43,6 @@ Example 2
 ```javascript
 
 	var count = 1000000000;
-	
 	var threadInstance = new Thread({
 		data: count,
 		job: function (count) {
@@ -65,7 +62,6 @@ Example 2
 			/* Do something here to handle the error */
 		}
 	});
-	
 	threadInstance.start();
 	
 ```
