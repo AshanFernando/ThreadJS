@@ -2,9 +2,15 @@ Thread JS - A simple library for JavaScript Thread support
 ==================================================
 
 Introduction
---------------------------------------
 
-ThreadJS is a simple approach to execute your JavaScript in different threads. This uses 'Workers' in HTML5 specifications and comes with a 'fallback' mechanism to support unsupported browsers.
+--------------------------------------
+ThreadJS is JavaScript library to simplify executing your JavaScript code in different threads. Though this library uses 'Workers' internally, interaction model is changed from a message based mechanism to a simple promise based execution pattern. Since the 'Worker' specification is not fully supported by all the major browsers, Thread JS comes with a 'fallback' mechanism to support unsupported browsers which will continue executing your JavaScript code within the 'Main Thread' instead.
+
+Workers
+--------------------------------------
+The 'Worker' interface spawns real OS-level threads. Since Thread JS uses workers internally, you are actually creating real OS-level threads to execute your JavaScript code. Web workers utilizes carefully controlled communication points with other threads limiting the ability to cause concurrency problems.
+
+Note: There's no access to non-thread safe components or the DOM and you have to pass specific data in and out of a thread through serialized objects (Copied).  Therefore its highly unlikely hard to cause problems in your code while executing in parallel.
 
 
 Support
@@ -34,43 +40,20 @@ thread.start(1000000000, function (size) {
 });
 	
 ```
-[JSFiddle](http://jsfiddle.net/ashanfer/D2qPV/10/)
+See the results in: [JSFiddle](http://jsfiddle.net/ashanfer/D2qPV/10/)
 
-Example 2
-----------
 
-```javascript
 
-	var count = 1000000000;
-	var threadInstance = new Thread({
-		data: count,
-		job: function (count) {
-			var result = 0;
-			for (i = 1; i < count; i++) {
-				result = result + i;
-			}
-			return result;
-		},
-		finish: function (result) {
-			/* Do something here to handle the result */
-			/* Use 'this.ReStart(<New Params Object>);' to perform the execution again without closing the Thread*/
-			/* If everthing is done 'Close' the thread */
-			this.close();
-		},
-		fail: function (error) {
-			/* Do something here to handle the error */
-		}
-	});
-	threadInstance.start();
-	
-```
-
-Note
+Browser Support
 --------------------------------------
-When passing parameter object, it is copied to the thread, instead of passing the reference by default by 'Worker' and by reference for fallback (When 'Worker') support is not there.
-More browser support will come in future.
+Thread JS currently supports Google Chrome 4.0 + and Mozilla Firefox 3.5+ and Fallback to Single Thread Support for Other browsers.
+
+Note: Though IE10/11 is in the compatibility list, [Security Bug](https://connect.microsoft.com/IE/feedback/details/801810/web-workers-from-blob-urls-in-ie-10-and-11) passing Blobs to Workers makes it fallback.
+
 
 Questions?
 ----------
 
-If you have any questions, please feel free to send an email to Ashan Fernando (ashan256@gmail.com)
+If you have any questions, feel free to contact me
+[Ashan Fernando](mailto:ashan256@gmail.com?Subject=ThreadJS%20Support)
+[Linkedin](http://www.linkedin.com/in/ashan256)
