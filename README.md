@@ -12,11 +12,6 @@ The 'Worker' interface spawns real OS-level threads. Since Thread JS uses worker
 Note: There's no access to non-thread safe components or the DOM and you have to pass specific data in and out of a thread through serialized objects (Copied).  Therefore its highly unlikely hard to cause problems in your code while executing in parallel.
 
 
-Support
---------------------------------------
-Currently this library supports the latest versions of Google Chrome and Firefox and deploys the fallback mechanism in other browsers. (More information about the specific version of browsers will be coming soon..)
-
-
 Example 1: 
 ----------
 Following code uses a new Thread to compute the summation of numbers from 1 - 1000,000,000 and returns the results to main Thread.
