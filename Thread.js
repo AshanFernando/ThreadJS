@@ -50,10 +50,10 @@
             return workerInstance;
         };
 
-        var create = function (forceSingleThread) {
+        var create = function (parallel) {
             var workerInstance;
             try {
-                workerInstance = forceSingleThread || !Worker ? singleThreadWorker(job) : multiThreadWorker(job);
+                workerInstance = (parallel === false) || !Worker ? singleThreadWorker(job) : multiThreadWorker(job);
             } catch (e) {     /* If Worker is not supported by the browser or causes issues, fallback to 'Single Thread Worker' mode */
                 workerInstance = singleThreadWorker(job);
             }
@@ -85,7 +85,7 @@
 
         this.start = function (data, job) {
             /* Initialize worker instance */
-            workerInstance = workerFactory(job).create(options.forceSingleThread);
+            workerInstance = workerFactory(job).create(options.parallel);
 
             workerInstance.onmessage = function (msg) {
                 /* After executing the job, call 'then' promise */
