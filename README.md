@@ -15,25 +15,7 @@ Currently this library supports the latest versions of Google Chrome and Firefox
 Example 1
 ----------
 
-```javascript
-
-	var threadInstance = new Thread();
-	var count = 1000000000;
-	threadInstance.start(count, function (count) {
-		var result = 0;
-		for (i = 1; i < count; i++) {
-			result = result + i;
-		}
-		return result;
-	}).finish(function (result) {
-		/* Do something here to handle the result */
-		/* If everthing is done 'Close' the thread */
-		this.close();
-	}).fail(function (error) {
-		/* Do something here to handle the error */
-	});
-			
-```
+<iframe width="100%" height="300" src="http://jsfiddle.net/ashanfer/D2qPV/10/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 
 Example 2
