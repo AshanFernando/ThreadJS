@@ -3,7 +3,7 @@
     var WorkerFactory = function (job) {
 
         var singleThreadWorker = function (jobFunc) {
-            /* Single Thread Worker to support fallback in unsupported browsers */
+            /* Single Thread Worker to support fallback for unsupported browsers */
             var SingleWorker = function () {
                 this.result = null;
                 this.error = null;
