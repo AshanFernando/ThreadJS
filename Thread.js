@@ -42,7 +42,6 @@
             url = URL.createObjectURL(blob),
             workerInstance = new Worker(url);
 
-            workerInstance.url = url;
             workerInstance.close = function () {
                 this.terminate();
                 if (blob && url) { /* Release the blob URL when closing Worker */
@@ -91,7 +90,7 @@
             workerInstance.onmessage = function (msg) {
                 /* After executing the job, call 'then' promise */
                 if (typeof thenPromise === 'function') {
-                    thenPromise.bind(self)(msg.data, self.getId());
+                    thenPromise.bind(self)(msg.data);
                 }
             };
 
@@ -123,10 +122,7 @@
             return this;
         };
 
-        this.getId = function () {
-            /* Return unique identifier of the Thread */
-            return workerInstance.url.split('/')[1];
-        };
+        this.id = options.id;
     };
 
     if (!window.Thread) {
