@@ -19,41 +19,36 @@
             var monitorStart = new Date();
             var count = 1000000000;
 
-            /* First Approach of using the 'Thread' with 'Promise' */
-            var thread1 = new Thread()
-            thread1.start(count, function (count) {
+            /* First thread */
+            var thread1 = new Thread({forceSingleThread : false});
+            thread1.start(count, function (size) {
                 var x = 0;
-                for (i = 1; i < count; i++) {
+                for (var i = 1; i < size; i++) {
                     x = x + i;
                 }
                 return x;
-            }).finish(function (result) {
+            }).then(function (result) {
                 var monitorEnd = new Date();
                 $("#loop1").html("Time taken for thread 1: " + (monitorEnd - monitorStart) + " milliseconds");
                 this.close();
             }).fail(function (error) {
-                console.log(error)
+                console.log(error);
             });
 
-            /* First Approach of using the 'Thread' with 'Constructor Object' */
-            var thread2 = new Thread({
-                data: count,
-                job: function (count) {
-                    var x = 0;
-                    for (i = 1; i < count; i++) {
-                        x = x + i * i;
-                    }
-                    return x;
-                },
-                finish: function (x) {
-                    var monitorEnd = new Date();
-                    $("#loop2").html("Time taken for thread 2: " + (monitorEnd - monitorStart) + " milliseconds");
-                },
-                error: function (error) {
-                    $("#info").html(error)
+            var thread2 = new Thread({ forceSingleThread: false });
+            thread2.start(count, function (size) {
+                var x = 0;
+                for (var i = 1; i < size; i++) {
+                    x = x + i;
                 }
-            })
-            thread2.start();
+                return x;
+            }).then(function (result) {
+                var monitorEnd = new Date();
+                $("#loop2").html("Time taken for thread 2: " + (monitorEnd - monitorStart) + " milliseconds");
+                this.close();
+            }).fail(function (error) {
+                console.log(error);
+            });
         }
     </script>
 </body>

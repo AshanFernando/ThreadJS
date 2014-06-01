@@ -1,113 +1,122 @@
 (function (window, Worker, Blob, URL) {
     'use strict';
-    window.Thread = function (config) {
+    var workerFactory = function (job) {
 
-        var self = this, jobCode, virtualScriptForWorker, blobURL, blobInstance, workerInstance, finishPromise, failPromise, result, error;
-
-        var createBlob = function (response) {
-            var blob, BlobBuilder;
-            try {
-                blob = new Blob([response], { type: 'text/javascript' });
-            } catch (e) { /* Backwards-compatibility */
-                BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
-                blob = new BlobBuilder();
-                blob.append(response);
-                blob = blob.getBlob();
-            }
-            return blob;
-        };
-
-        var createWorker = function (url, job) {
-            var worker, virtualWorker = function (job) {
-                return {
-                    postMessage: function (data) {
-                        try{
-                            result = job(data);
-                            if (config && config.job) { /* If job is passed as callback */
-                                this.onmessage({ data: result });
-                            }
-                        } catch (e) {
-                            error = e;
-                            if (config && config.fail) { /* If fail is passed as callback */
-                                this.onerror(error);
-                            }
-                        }
+        var singleThreadWorker = function (job) {
+            var worker = function () {
+                this.result = null;
+                this.error = null;
+                this.postMessage = function (data) {
+                    try {
+                        this.result = job(data);
+                    } catch (e) {
+                        this.error = e;
                     }
                 };
-            };
-            try {
-                worker = !Worker ? virtualWorker(job) : new Worker(url);
-            } catch (e) {     /* If Worker is not supported by the browser or causes issues, fallback to 'Single Thread' mode */
-                worker = virtualWorker(job);
+                this.close = function() {
+                    this.result = null;
+                    this.error = null;
+                };
             }
-            return worker;
+            return new worker(job);
         };
 
-        this.finish = function (callback) {
-            if (result) { /* If job is passed as a promise */
-                callback.bind(this)(result);
+        var multiThreadWorker = function (job) {
+            var createBlob = function (response) {
+                var blob, BlobBuilder;
+                try {
+                    blob = new Blob([response], { type: 'text/javascript' });
+                } catch (e) { /* Backwards-compatibility */
+                    BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+                    blob = new BlobBuilder();
+                    blob.append(response);
+                    blob = blob.getBlob();
+                }
+
+                return blob;
+            },
+            jobCode = 'onmessage = function (msg) { var job = ' + job.toString() + '; var result = job(msg.data); this.postMessage(result); };',
+            blob = createBlob(jobCode),
+            url = URL.createObjectURL(blob),
+            workerInstance = new Worker(url);
+
+            workerInstance.url = url;
+            workerInstance.close = function () {
+                this.terminate();
+                if (blob && url) { /* Release the blob URL when closing Worker */
+                    URL.revokeObjectURL(url);
+                };
             }
-            finishPromise = callback;
+            return workerInstance;
+        };
+
+        var create = function (forceSingleThread) {
+            var workerInstance;
+            try {
+                workerInstance = forceSingleThread || !Worker ? singleThreadWorker(job) : multiThreadWorker(job);
+            } catch (e) {     /* If Worker is not supported by the browser or causes issues, fallback to 'Single Thread Worker' mode */
+                workerInstance = singleThreadWorker(job);
+            }
+            return workerInstance;
+        }
+
+        return { create: create };
+    };
+
+    var Thread = function (opt) {
+
+        var self = this, options = opt || {}, workerInstance, thenPromise, failPromise;
+
+        this.then = function (callback) {
+            if (workerInstance.result) { /* If job is passed as a promise */
+                callback.bind(this)(workerInstance.result);
+            }
+            thenPromise = callback;
             return this;
         };
+
         this.fail = function (callback) {
-            if (error) { /* If job is passed as a promise */
-                callback.bind(this)(error);
+            if (workerInstance.error) { /* If job is passed as a promise */
+                callback.bind(this)(workerInstance.error);
             }
             failPromise = callback;
             return this;
         };
 
         this.start = function (data, job) {
-            /* Initialize data */
-            job = job || config.job;
-            jobCode = job.toString();
-            virtualScriptForWorker = 'onmessage = function (msg) { var job = ' + jobCode + '; var result = job(msg.data); this.postMessage(result); };';
-            blobInstance = createBlob(virtualScriptForWorker);
-            blobURL = URL.createObjectURL(blobInstance);
-            workerInstance = createWorker(blobURL, job);
+            /* Initialize worker instance */
+            workerInstance = workerFactory(job).create(options.forceSingleThread);
 
             workerInstance.onmessage = function (msg) {
-                /* After executing the job, fire 'finish' event */
-                var finish = config && config.finish ? config.finish.bind(self) : finishPromise ? finishPromise.bind(self) : undefined;
-                if (typeof finish === 'function') {
-                    finish(msg.data, self.getId());
+                /* After executing the job, call 'then' promise */
+                if (typeof thenPromise === 'function') {
+                    thenPromise.bind(self)(msg.data, self.getId());
                 }
             };
 
             workerInstance.onerror = function (msg) {
-                /* If error occurs while executing code call 'fail' event */
-                var fail = config && config.fail ? config.fail.bind(self) : failPromise ? failPromise.bind(self) : undefined;
-                if (typeof fail === 'function') {
-                    fail(msg);
+                /* If error occurs while executing code call 'fail' promise */
+                if (typeof failPromise === 'function') {
+                    failPromise.bind(self)(msg);
                 }
             };
 
             /* Start worker */
-            workerInstance.postMessage(data || config.data);
+            workerInstance.postMessage(data);
             return this;
         };
 
         this.close = function () {
-            if (workerInstance.terminate) {
-                workerInstance.terminate();
-            }
-            if (blobURL) { /* Release the blob URL when closing Worker */
-                URL.revokeObjectURL(blobURL);
-            }
-            /* Release blob resources explicitely in IE */
-            if (blobInstance.msClose) {
-                blobInstance.msClose();
-            }
+            workerInstance.close();
         };
 
         this.reStart = function (data) {
             /* Re-execute job with new parameters */
-            if (result) {
-                result = null;
+            if (workerInstance.result) {
+                workerInstance.result = null;
             }
-            if (error) {
-                error = null;
+            if (workerInstance.error) {
+                workerInstance.error = null;
             }
             workerInstance.postMessage(data);
             return this;
@@ -115,7 +124,15 @@
 
         this.getId = function () {
             /* Return unique identifier of the Thread */
-            return blobURL.split('/')[1];
+            return workerInstance.url.split('/')[1];
         };
     };
+
+    if (!window.Thread) {
+        /* Initialize global Thread object */
+        window.Thread = Thread;
+    }
+
+    return Thread;
+
 }(window, window.Worker, Blob, window.URL || window.webkitURL));
