@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <div id="info">Press start to run 1,000,000,000 sized loops in parrallel.</div>
+    <div>
+        <span>No of items per loop: <input id="count" type="text" value="1000000000" /></span>
+        <span>No of threads: <input id="threadsCount" value="2" type="text" /></span>
+        <span>Run in parallel: <input id="parallel" type="checkbox" checked="true" /></span>
+        
+        <button id="start">Start</button>
+    </div>
+    <div id="threadInfo">
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="Thread.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#start').on('click', function () {
+                $('#threadInfo').empty();
+                executeCode();
+            });
+        });
+        var executeCode = function () {
+            $("#info").html("Loops are running .... wait for few seconds !");
+            var monitorStart = new Date();
+            var count = Number($('#count').val());
+            var runInParallel = $('#parallel').is(':checked');
+            var threadsCount = Number($('#threadsCount').val());
+            for (var j = 0; j < threadsCount; j++) {
+                var thread = new Thread({ id: j, parallel: runInParallel });
+                thread.start(count, function (size) {
+                    var x = 0;
+                    for (var i = 1; i < size; i++) {
+                        x = x + i;
+                    }
+                    return x;
+                }).then(function (result) {
+                    var monitorEnd = new Date();
+                    var $infoItem = $('<p></p>');
+                    $infoItem.html("Time taken for thread " + this.id + ": " + (monitorEnd - monitorStart) + " milliseconds");
+                    $("#threadInfo").append($infoItem);
+                    this.close();
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
