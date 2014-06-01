@@ -12,11 +12,29 @@ Support
 Currently this library supports the latest versions of Google Chrome and Firefox and deploys the fallback mechanism in other browsers. (More information about the specific version of browsers will be coming soon..)
 
 
-Example 1
+Example 1: 
 ----------
+Following code uses a new Thread to compute the summation of numbers from 0 - 1000,000,000 and returns the results to main Thread.
 
-<iframe width="100%" height="300" src="http://jsfiddle.net/ashanfer/D2qPV/10/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+```javascript
 
+var thread = new Thread();
+thread.start(1000000000, function (size) {
+    var x = 0;
+    for (var i = 1; i < size; i++) {
+        x = x + i;
+    }
+    return x;
+}).then(function (result) {
+    console.log('Result: ' + result);
+    this.close();
+}).fail(function (error) {
+    console.log('Error: ' + error);
+    this.close();
+});
+	
+```
+[JSFiddle](http://jsfiddle.net/ashanfer/D2qPV/10/)
 
 Example 2
 ----------
