@@ -14,7 +14,7 @@ Note: There's no access to non-thread safe components or the DOM and you have to
 
 Example 1: 
 ----------
-Following code uses a new Thread to compute the summation of numbers from 1 - 1000,000,000 and returns the results to main Thread.
+Following code uses a new Thread to compute the summation of numbers from 1 - 1,000,000,000 and returns the results to main Thread.
 
 ```javascript
 
@@ -39,7 +39,7 @@ See the results in: [JSFiddle](http://jsfiddle.net/ashanfer/D2qPV/10/)
 
 Example 2: 
 ----------
-Comparing Single Thread vs Multi-Thread Execution Time
+Comparing Single-Thread vs Multi-Thread summation of numbers from 1 - 2,000,000,000.
 
 ```javascript
 /*Start: Code segment 1 : Note :- This code runs in the Main Thread*/
@@ -88,7 +88,7 @@ thread2.start(null, function () {
 /*End: Code segment 2 */
 	
 ```
-For more info see the results in: [JSFiddle](http://jsfiddle.net/ashanfer/K88L3/3/)
+See the results in: [JSFiddle](http://jsfiddle.net/ashanfer/K88L3/3/)
 
 Browser Support
 --------------------------------------
