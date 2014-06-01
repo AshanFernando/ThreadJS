@@ -2,13 +2,13 @@
     'use strict';
     var workerFactory = function (job) {
 
-        var singleThreadWorker = function (job) {
+        var singleThreadWorker = function (jobFunc) {
             var worker = function () {
                 this.result = null;
                 this.error = null;
                 this.postMessage = function (data) {
                     try {
-                        this.result = job(data);
+                        this.result = jobFunc(data);
                     } catch (e) {
                         this.error = e;
                     }
@@ -21,7 +21,7 @@
             return new worker(job);
         };
 
-        var multiThreadWorker = function (job) {
+        var multiThreadWorker = function (jobFunc) {
             var createBlob = function (response) {
                 var blob, BlobBuilder;
                 try {
@@ -35,7 +35,7 @@
 
                 return blob;
             },
-            jobCode = 'onmessage = function (msg) { var job = ' + job.toString() + '; var result = job(msg.data); this.postMessage(result); };',
+            jobCode = 'onmessage = function (msg) { var job = ' + jobFunc.toString() + '; var result = job(msg.data); this.postMessage(result); };',
             blob = createBlob(jobCode),
             url = URL.createObjectURL(blob),
             workerInstance = new Worker(url);

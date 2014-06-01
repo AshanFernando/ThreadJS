@@ -20,7 +20,7 @@
             var count = 1000000000;
 
             /* First thread */
-            var thread1 = new Thread({forceSingleThread : false});
+            var thread1 = new Thread({forceSingleThread : true});
             thread1.start(count, function (size) {
                 var x = 0;
                 for (var i = 1; i < size; i++) {
@@ -35,7 +35,7 @@
                 console.log(error);
             });
 
-            var thread2 = new Thread({ forceSingleThread: false });
+            var thread2 = new Thread({ forceSingleThread: true });
             thread2.start(count, function (size) {
                 var x = 0;
                 for (var i = 1; i < size; i++) {
