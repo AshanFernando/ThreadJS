@@ -3,6 +3,7 @@
     var workerFactory = function (job) {
 
         var singleThreadWorker = function (jobFunc) {
+            /* Single Thread Worker to support fallback in unsupported browsers */
             var worker = function () {
                 this.result = null;
                 this.error = null;
@@ -13,7 +14,7 @@
                         this.error = e;
                     }
                 };
-                this.close = function() {
+                this.close = function () {
                     this.result = null;
                     this.error = null;
                 };
@@ -22,6 +23,7 @@
         };
 
         var multiThreadWorker = function (jobFunc) {
+            /* Multi Thread Worker that uses 'Worker' object */
             var createBlob = function (response) {
                 var blob, BlobBuilder;
                 try {
@@ -59,7 +61,6 @@
             }
             return workerInstance;
         }
-
         return { create: create };
     };
 
@@ -68,7 +69,7 @@
         var self = this, options = opt || {}, workerInstance, thenPromise, failPromise;
 
         this.then = function (callback) {
-            if (workerInstance.result) { /* If job is passed as a promise */
+            if (workerInstance.result) { /* Initialize then promise */
                 callback.bind(this)(workerInstance.result);
             }
             thenPromise = callback;
@@ -76,7 +77,7 @@
         };
 
         this.fail = function (callback) {
-            if (workerInstance.error) { /* If job is passed as a promise */
+            if (workerInstance.error) { /* Initialize fail promise */
                 callback.bind(this)(workerInstance.error);
             }
             failPromise = callback;
