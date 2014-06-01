@@ -19,14 +19,14 @@ Currently this library supports the latest versions of Google Chrome and Firefox
 
 Example 1: 
 ----------
-Following code uses a new Thread to compute the summation of numbers from 0 - 1000,000,000 and returns the results to main Thread.
+Following code uses a new Thread to compute the summation of numbers from 1 - 1000,000,000 and returns the results to main Thread.
 
 ```javascript
 
 var thread = new Thread();
 thread.start(1000000000, function (size) {
     var x = 0;
-    for (var i = 1; i < size; i++) {
+    for (var i = 1; i <= size; i++) {
         x = x + i;
     }
     return x;
@@ -42,6 +42,58 @@ thread.start(1000000000, function (size) {
 See the results in: [JSFiddle](http://jsfiddle.net/ashanfer/D2qPV/10/)
 
 
+Example 2: 
+----------
+Comparing Single Thread vs Multi-Thread Execution Time
+
+```javascript
+/*Start: Code segment 1 : Note :- This code runs in the Main Thread*/
+var s1_start = new Date();
+var x = 0;
+for (var i = 1; i <= 2000000000; i++) {
+    x = x + i;
+}
+var s1_end = new Date();
+console.log('Result 1: ' + x + ' ( ' + (s1_end - s1_start) + '  milliseconds)');
+
+/*End: Code segment 1 */
+
+/*Start: Code segment 2 : Note :- Two Threads are used to compute the value*/
+var s2_start = new Date(),
+    s2_end;
+var y = 0;
+var thread1 = new Thread();
+thread1.start(null, function () {
+    var x = 0;
+    for (var i = 1; i <= 1000000000; i++) {
+        x = x + i;
+    }
+    return x;
+}).then(function (result) {
+    y = y + result;
+    s2_end = new Date();
+    console.log('Result 2: ' + y + ' ( ' + (s2_end - s2_start) + '  milliseconds)');
+    this.close();
+});
+
+var thread2 = new Thread();
+thread2.start(null, function () {
+    var x = 0;
+    for (var i = 1000000001; i <= 2000000000; i++) {
+        x = x + i;
+    }
+    return x;
+}).then(function (result) {
+    y = y + result;
+    s2_end = new Date();
+    console.log('Result 2: ' + y + ' ( ' + (s2_end - s2_start) + '  milliseconds)');
+    this.close();
+})
+
+/*End: Code segment 2 */
+	
+```
+For More info see the results in: [JSFiddle](http://jsfiddle.net/ashanfer/K88L3/2/)
 
 Browser Support
 --------------------------------------
