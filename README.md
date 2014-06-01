@@ -93,7 +93,7 @@ thread2.start(null, function () {
 /*End: Code segment 2 */
 	
 ```
-For More info see the results in: [JSFiddle](http://jsfiddle.net/ashanfer/K88L3/2/)
+For more info see the results in: [JSFiddle](http://jsfiddle.net/ashanfer/K88L3/2/)
 
 Browser Support
 --------------------------------------
