@@ -2,7 +2,6 @@ Thread JS - A simple library for JavaScript Thread support
 ==================================================
 
 Introduction
-
 --------------------------------------
 ThreadJS is JavaScript library to simplify executing your JavaScript code in different threads. Though this library uses 'Workers' internally, interaction model is changed from a message based mechanism to a simple promise based execution pattern. Since the 'Worker' specification is not fully supported by all the major browsers, Thread JS comes with a 'fallback' mechanism to support unsupported browsers which will continue executing your JavaScript code within the 'Main Thread' instead.
 
@@ -54,6 +53,4 @@ Note: Though IE10/11 is in the compatibility list, [Security Bug](https://connec
 Questions?
 ----------
 
-If you have any questions, feel free to contact me
-[Ashan Fernando](mailto:ashan256@gmail.com?Subject=ThreadJS%20Support)
-[Linkedin](http://www.linkedin.com/in/ashan256)
+If you have any questions, feel free to contact me Email: [ashan256@gmail.com](mailto:ashan256@gmail.com?Subject=ThreadJS%20Support), Linkedin: [Profile Link](http://www.linkedin.com/in/ashan256)
