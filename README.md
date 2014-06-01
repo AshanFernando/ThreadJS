@@ -39,7 +39,8 @@ See the results in: [JSFiddle](http://jsfiddle.net/ashanfer/D2qPV/10/)
 
 Example 2: 
 ----------
-Comparing Single-Thread vs Multi-Thread summation of numbers from 1 - 2,000,000,000.
+Comparing Single-Thread vs Multi-Thread summation of numbers from 1 - 2,000,000,000. 
+Note: Multi-Thread approach uses almost half of the time needed for Single-Thread approach.
 
 ```javascript
 /*Start: Code segment 1 : Note :- This code runs in the Main Thread*/
