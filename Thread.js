@@ -1,10 +1,10 @@
 (function (window, Worker, Blob, URL) {
     'use strict';
-    var workerFactory = function (job) {
+    var WorkerFactory = function (job) {
 
         var singleThreadWorker = function (jobFunc) {
             /* Single Thread Worker to support fallback in unsupported browsers */
-            var worker = function () {
+            var SingleWorker = function () {
                 this.result = null;
                 this.error = null;
                 this.postMessage = function (data) {
@@ -18,11 +18,9 @@
                     this.result = null;
                     this.error = null;
                 };
-            }
-            return new worker(job);
-        };
-
-        var multiThreadWorker = function (jobFunc) {
+            };
+            return new SingleWorker(job);
+        }, multiThreadWorker = function (jobFunc) {
             /* Multi Thread Worker that uses 'Worker' object */
             var createBlob = function (response) {
                 var blob, BlobBuilder;
@@ -46,24 +44,20 @@
                 this.terminate();
                 if (blob && url) { /* Release the blob URL when closing Worker */
                     URL.revokeObjectURL(url);
-                };
-            }
+                }
+            };
             return workerInstance;
-        };
-
-        var create = function (parallel) {
+        }, create = function (parallel) {
             var workerInstance;
             try {
                 workerInstance = (parallel === false) || !Worker ? singleThreadWorker(job) : multiThreadWorker(job);
-            } catch (e) {     /* If Worker is not supported by the browser or causes issues, fallback to 'Single Thread Worker' mode */
+            } catch (e) { /* If Worker is not supported by the browser or causes issues, fallback to 'Single Thread Worker' mode */
                 workerInstance = singleThreadWorker(job);
             }
             return workerInstance;
-        }
+        };
         return { create: create };
-    };
-
-    var Thread = function (opt) {
+    }, Thread = function (opt) {
 
         var self = this, options = opt || {}, workerInstance, thenPromise, failPromise;
 
@@ -85,7 +79,7 @@
 
         this.start = function (data, job) {
             /* Initialize worker instance */
-            workerInstance = workerFactory(job).create(options.parallel);
+            workerInstance = WorkerFactory(job).create(options.parallel);
 
             workerInstance.onmessage = function (msg) {
                 /* After executing the job, call 'then' promise */
